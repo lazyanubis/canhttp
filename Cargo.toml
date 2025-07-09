@@ -1,42 +1,34 @@
-[package]
-name = "canhttp"
-version = "0.2.0"
-description = "Rust library to issue HTTPs outcalls from a canister on the Internet Computer"
-license = "Apache-2.0"
-readme = "README.md"
+[workspace]
+members = ["canhttp"]
+resolver = "2"
+
+[workspace.package]
 authors = ["DFINITY Foundation"]
 edition = "2021"
-include = ["src", "Cargo.toml", "CHANGELOG.md", "LICENSE", "README.md"]
-repository = "https://github.com/dfinity/evm-rpc-canister"
-documentation = "https://docs.rs/canhttp"
+repository = "https://github.com/dfinity/canhttp"
+homepage = "https://github.com/dfinity/canhttp"
+license = "Apache-2.0"
+readme = "README.md"
 
-[dependencies]
-assert_matches = { workspace = true }
-ciborium = { workspace = true, optional = true }
-ic-cdk = { workspace = true }
-ic-error-types = { workspace = true }
-sha2 = { workspace = true, optional = true }
-futures-channel = { workspace = true, optional = true }
-futures-util = { workspace = true }
-http = { workspace = true, optional = true }
-num-traits = { workspace = true, optional = true }
-pin-project = { workspace = true }
-serde = { workspace = true, optional = true }
-serde_json = { workspace = true, optional = true }
-tower = { workspace = true, features = ["retry"] }
-tower-layer = { workspace = true, optional = true }
-thiserror = { workspace = true }
-
-[dev-dependencies]
-candid = { workspace = true }
-itertools = { workspace = true }
-maplit = { workspace = true }
-proptest = { workspace = true }
-strum = { workspace = true }
-tokio = { workspace = true, features = ["full"] }
-
-[features]
-default = ["http"]
-http = ["dep:http", "dep:num-traits", "dep:tower-layer"]
-json = ["http", "dep:serde", "dep:serde_json"]
-multi = ["dep:ciborium", "dep:sha2", "dep:futures-channel"]
+[workspace.dependencies]
+assert_matches = "1.5.0"
+candid = { version = "0.10.13" }
+ciborium = "0.2.2"
+futures-channel = "0.3.31"
+futures-util = "0.3.31"
+http = "1.3.1"
+ic-cdk = "0.17.2"
+ic-error-types = "0.2"
+itertools = "0.14.0"
+maplit = "1.0.2"
+num-traits = "0.2.19"
+pin-project = "1.1.10"
+proptest = "1.6.0"
+serde = "1.0"
+serde_json = "1.0"
+sha2 = "0.10.8"
+strum = { version = "0.27.1", features = ["derive"] }
+thiserror = "2.0.12"
+tokio = "1.44.1"
+tower = "0.5.2"
+tower-layer = "0.3.3"
