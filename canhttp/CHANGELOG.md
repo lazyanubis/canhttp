@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.1] - 2025-07-11
+
+### Added
+
+- An `iter` method to `canhttp::multi::MultiResults` returning a borrowing iterator.
+
+### Changed
+- The `canhttp` crate has been moved from the [`evm-rpc-canister`](https://github.com/dfinity/evm-rpc-canister) repository to the new [`canhttp`](https://github.com/dfinity/canhttp) repository.
+
 ## [0.2.0] - 2025-07-08
 
 ### Added
