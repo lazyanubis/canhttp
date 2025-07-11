@@ -11,7 +11,7 @@ mod tests;
 
 use futures_channel::mpsc;
 use futures_util::StreamExt;
-use std::collections::{btree_map::IntoIter as BTreeMapIntoIter, BTreeMap};
+use std::collections::{btree_map, btree_map::IntoIter as BTreeMapIntoIter, BTreeMap};
 use std::fmt::Debug;
 use std::iter::FusedIterator;
 use tower::{Service, ServiceExt};
@@ -338,7 +338,62 @@ impl<K: Ord, V, E> MultiResults<K, V, E> {
             self.insert_once_err(key, error);
         }
     }
+
+    /// A borrowing iterator over the entries of a [`MultiResults`],
+    /// where the [`Ok`] results are given first (sorted by key) and then
+    /// the [`Err`] results (also sorted by key).
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use canhttp::multi::MultiResults;
+    ///
+    /// let results = MultiResults::from_non_empty_iter(vec![
+    ///     (0, Ok("yes")),
+    ///     (1, Err("wrong")),
+    ///     (2, Ok("no"))
+    /// ]);
+    ///
+    /// let mut iter = results.iter();
+    ///
+    /// assert_eq!(iter.next(), Some((&0, Ok(&"yes"))));
+    /// assert_eq!(iter.next(), Some((&2, Ok(&"no"))));
+    /// assert_eq!(iter.next(), Some((&1, Err(&"wrong"))));
+    /// assert_eq!(iter.next(), None);
+    /// ```
+    pub fn iter(&self) -> Iter<K, V, E> {
+        Iter {
+            ok_results_iter: self.ok_results.iter(),
+            errors_iter: self.errors.iter(),
+        }
+    }
 }
+
+/// A borrowing iterator over the entries of a [`MultiResults`],
+/// where the [`Ok`] results are given first (sorted by key) and then
+/// the [`Err`] results (also sorted by key).
+///
+/// This `struct` is created by the [`iter`] method on [`MultiResults`].
+/// See its documentation for more.
+///
+/// [`iter`]: MultiResults::iter
+pub struct Iter<'a, K, V, E> {
+    ok_results_iter: btree_map::Iter<'a, K, V>,
+    errors_iter: btree_map::Iter<'a, K, E>,
+}
+
+impl<'a, K, V, E> Iterator for Iter<'a, K, V, E> {
+    type Item = (&'a K, Result<&'a V, &'a E>);
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.ok_results_iter
+            .next()
+            .map(|(k, v)| (k, Ok(v)))
+            .or_else(|| self.errors_iter.next().map(|(k, e)| (k, Err(e))))
+    }
+}
+
+impl<'a, K, V, E> FusedIterator for Iter<'a, K, V, E> {}
 
 /// An owning iterator over the entries of a [`MultiResults`],
 /// where the [`Ok`] results are given first (sorted by key) and then
