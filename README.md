@@ -7,4 +7,47 @@
 
 Library to make [HTTPs outcalls](https://internetcomputer.org/https-outcalls) from a canister on the Internet Computer, leveraging the modularity of the [tower framework](https://rust-lang.guide/guide/learn-async-rust/tower.html).
 
-See the [Rust documentation](https://docs.rs/canhttp) for more details.
+## Usage
+
+Add this to your `Cargo.toml` (see [crates.io](https://crates.io/crates/canhttp) for the latest version):
+
+```toml
+canhttp = "0.2.1"
+```
+
+Then, use the library to create an HTTP POST request, as follows:
+```rust
+let request = http::Request::post("https://httpbin.org/anything")
+    .max_response_bytes(1_000)
+    .header("X-Id", "42")
+    .body("Hello, World!".as_bytes().to_vec())
+    .unwrap();
+
+let response = http_client()
+    .ready()
+    .await
+    .expect("Client should be ready")
+    .call(request)
+    .await
+    .expect("Request should succeed");
+```
+
+Complete examples are available [here](examples) and see also the [Rust documentation](https://docs.rs/canhttp) for more details.
+
+## Cargo Features
+
+### Feature `http`
+
+Offers middleware that transforms a low-level service that uses Candid types into one that uses types from the [http](https://crates.io/crates/http) crate.
+
+### Feature `json`
+
+Offers middleware that transforms a low-level service that transmits bytes into one that transmits JSON payloads.
+
+### Feature `multi`
+
+Make multiple calls in parallel and handle their multiple results.
+
+## License
+
+This project is licensed under the [Apache License 2.0](https://opensource.org/licenses/Apache-2.0).
